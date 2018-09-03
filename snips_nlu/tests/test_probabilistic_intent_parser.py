@@ -4,9 +4,9 @@ from pathlib import Path
 
 from mock import patch
 
-from snips_nlu.builtin_entities import BuiltinEntityParser
 from snips_nlu.constants import RES_INTENT, RES_INTENT_NAME
 from snips_nlu.dataset import validate_and_format_dataset
+from snips_nlu.entity_parser import BuiltinEntityParser
 from snips_nlu.intent_classifier import IntentClassifier, \
     LogRegIntentClassifier
 from snips_nlu.intent_parser import ProbabilisticIntentParser
@@ -236,12 +236,16 @@ class TestProbabilisticIntentParser(FixtureTest):
         # Given
         dataset = BEVERAGE_DATASET
         intent_parser = ProbabilisticIntentParser().fit(dataset)
+        builtin_entity_parser = intent_parser.builtin_entity_parser
+        custom_entity_parser = intent_parser.custom_entity_parser
 
         # When
         intent_parser_bytes = intent_parser.to_byte_array()
         loaded_intent_parser = ProbabilisticIntentParser.from_byte_array(
             intent_parser_bytes,
-            builtin_entity_parser=BuiltinEntityParser("en", None))
+            builtin_entity_parser=builtin_entity_parser,
+            custom_entity_parser=custom_entity_parser
+        )
         result = loaded_intent_parser.parse("make me two cups of tea")
 
         # Then
